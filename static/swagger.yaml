@@ -1,0 +1,48 @@
+openapi: 3.0.0
+info:
+  description: This API should be integrated by planners
+  version: "1.0.0"
+  title: Planner API
+paths:
+  /plan:
+    post:
+      summary: Get optimal vm configuration
+      operationId: planFile
+      description: send application topology and parameters and we return number of vms and sizes
+      responses:
+        '200':
+          description: VM configuration succesfully generated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VirtualMachine'
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+         content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+components:
+  schemas:
+    VirtualMachine:
+      type: object
+      required:
+        - cpus
+        - diskSize
+        - memSize
+      properties:
+        cpus:
+          type: integer
+          example: 5
+        diskSize:
+          type: string
+          example: '10 GB'
+        releaseDate:
+          type: string
+          example: '500 MB'
+
