@@ -98,7 +98,7 @@ def graphCheckEST():
 
         maxest = 0
         dominant_parent = -1
-        p_iter = G.predecessors(n)
+        p_iter = iter(G.predecessors(n))
         while True:
             try:
                 p = next(p_iter)
@@ -154,7 +154,7 @@ def graphCheckLFT():
 
         minlft = deadline
         dominant_child = -1
-        c_iter = G.successors(n)
+        c_iter = iter(G.successors(n))
         while True:
             try:
                 c = next(c_iter)
@@ -284,7 +284,7 @@ def graphCalcEFT(d):
     maxest = 0
 
     predecessors = []
-    p_iter = G.predecessors(d)
+    p_iter = iter(G.predecessors(d))
     while True:
         try:
             p = next(p_iter)
@@ -374,7 +374,7 @@ def graphCalcLST(d):
     minlft = deadline
 
     successors = []
-    c_iter = G.successors(d)
+    c_iter = iter(G.successors(d))
     while True:
         try:
             c = next(c_iter)
@@ -562,7 +562,7 @@ def assignParents(d):
 def hasUnassignedParents(d):
     # unassigned parents?
     unassigned = 0
-    p_iter = G.predecessors(d)
+    p_iter = iter(G.predecessors(d))
     while True:
         try:
             p = next(p_iter)
@@ -579,7 +579,7 @@ def hasUnassignedParents(d):
 def hasUnassignedChildren(d):
     # unassigned cildren?
     unassigned = 0
-    c_iter = G.successors(d)
+    c_iter = iter(G.successors(d))
     while True:
         try:
             c = next(c_iter)
@@ -597,7 +597,7 @@ def getCriticalParent(d):
     max_time = 0
     cp = -1
     d_est = G.node[d]["EST"]
-    p_iter = G.predecessors(d)
+    p_iter = iter(G.predecessors(d))
     while True:
         try:
             p = next(p_iter)
@@ -926,7 +926,7 @@ def determineClusterLimits(p, q):
     # print "determineClusterLimits([",p,"])"
     for i in p:
         num_children = 0
-        c_iter = G.successors(i)
+        c_iter = iter(G.successors(i))
 
         min_lft_p = 2 * deadline
         d_node = -1
@@ -963,7 +963,7 @@ def determineClusterLimits(p, q):
                 # print "  c) lft_limits <-","t"+str(G.node[ p[len(p)-1] ]["name"])+"("+str( G.node[ p[len(p)-1] ]["LFT"] )+")"
 
         num_parents = 0
-        p_iter = G.predecessors(i)
+        p_iter = iter(G.predecessors(i))
 
         max_est_p = 0
         d_node = -1
@@ -1161,7 +1161,7 @@ def updateSuccessors(p):
     # all successors, as LST of successors applied
     if hasUnassignedChildren(p):
         successors = []
-        c_iter = G.successors(p)
+        c_iter = iter(G.successors(p))
         while True:
             try:
                 c = next(c_iter)
@@ -1186,7 +1186,7 @@ def updatePredecessors(c):
     global G
     if hasUnassignedParents(c):
         predecessors = []
-        p_iter = G.predecessors(c)
+        p_iter = iter(G.predecessors(c))
         while True:
             try:
                 p = next(p_iter)
@@ -1217,7 +1217,7 @@ def updateNode(n):
     ninstance = G.node[n]["Instance"]
 
     predecessors = []
-    p_iter = G.predecessors(n)
+    p_iter = iter(G.predecessors(n))
     while True:
         try:
             p = next(p_iter)
@@ -1253,7 +1253,7 @@ def updateNode(n):
         G.node[n]["EFT"] += G.node[n]["time1"]
 
     successors = []
-    p_iter = G.successors(n)
+    p_iter = iter(G.successors(n))
     while True:
         try:
             p = next(p_iter)
@@ -1438,7 +1438,7 @@ def main(argv):
     price_file = ''
 
     if options.file:
-        dag_file = options.dir + '/' + options.file + '/' + options.file + '.propfile'
+        dag_file = options.dir + '//' + options.file + '//' + options.file + '.propfile'
         perf_file = options.dir + '/' + options.file + '/performance'
         deadline_file = options.dir + '/' + options.file + '/deadline'
         price_file = options.dir + '/' + options.file + '/price'
@@ -1512,7 +1512,7 @@ def main(argv):
     print(inlist)
     num_zero = 0
     for j in inlist:
-        if j[1] == 0:
+        if inlist[j] == 0:
             num_zero += 1
     if num_zero > 1 or (num_zero == 1 and G.node[0]["time1"] > 0):
         if num_zero > 1:
@@ -1556,7 +1556,7 @@ def main(argv):
     print(outlist)
     num_zero = 0
     for j in outlist:
-        if j[1] == 0:
+        if inlist[j] == 0:
             num_zero += 1
 
     if num_zero > 1 or (num_zero == 1 and G.node[number_of_nodes - 1]["time1"] > 0):
@@ -1760,6 +1760,7 @@ def main(argv):
 # The program starts here...
 #############################
 if __name__ == '__main__':
+    dir = os.getcwd()
     main(sys.argv[1:])
 
 #############################
