@@ -42,7 +42,25 @@ components:
         diskSize:
           type: string
           example: '10 GB'
-        releaseDate:
+        memSize:
           type: string
           example: '500 MB'
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
 
+    Task:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: 'Compile1'
+        startTime:
+          type: integer
+          example: 0
+        endTime:
+          type: integer
+          example: 7
