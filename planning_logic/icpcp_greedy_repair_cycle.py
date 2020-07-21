@@ -1420,32 +1420,49 @@ def getNonInstanceNodes():
 
 
 #### the main function starts here...
-def main(argv):
+def main(argv, command_line=True):
     global verbose, G, number_of_nodes, deadline, prices
-    usage = "usage: %prog options name"
-    parser = OptionParser(usage)
-    parser.set_defaults(runs=1, iters=1)
-    parser.add_option("-d", "--dir", dest="dir", help="specify input directory", type="string", default="input")
-    parser.add_option("-i", "--file", dest="file", help="specify input file", type="string", default="")
-    parser.add_option("-j", "--jason", dest="json", help="dump json file", type="int", default="0")
-    parser.add_option("-p", "--perc", dest="perc", help="cp percentage deadline", type="int", default="-1")
-    parser.add_option("-v", "--verbose", dest="verbose", help="verbose output", type="int", default="0")
-    (options, args) = parser.parse_args()
 
-    dag_file = ''
-    perf_file = ''
-    deadline_file = ''
-    price_file = ''
+    dag_file = 'input//input//pcp//pcp.propfile'
+    perf_file = 'input//input//pcp//performance'
+    deadline_file = 'input//input//pcp//deadline'
+    price_file = 'input//input//pcp//price'
 
-    if options.file:
-        dag_file = options.dir + '//' + options.file + '//' + options.file + '.propfile'
-        perf_file = options.dir + '/' + options.file + '/performance'
-        deadline_file = options.dir + '/' + options.file + '/deadline'
-        price_file = options.dir + '/' + options.file + '/price'
-    else:
-        sys.exit("\nERROR - Missing option -f or --file.\n")
-    verbose = options.verbose
+    #load input via yaml
+    # if not command_line:
+    #     with open(combined_input, 'r') as stream:
+    #         data_loaded = yaml.safe_load(stream)
+    #         self.vm_price = data_loaded[0]["price"]
+    #         self.deadline = data_loaded[2]["deadline"]
+    #         perf_data = data_loaded[1]["performance"]
+    #         l = []
+    #         for key, value in perf_data.items():
+    #             l.append(value)
 
+    #load input via cmd
+    # else:
+
+    # usage = "usage: %prog options name"
+    # parser = OptionParser(usage)
+    # parser.set_defaults(runs=1, iters=1)
+    # parser.add_option("-d", "--dir", dest="dir", help="specify input directory", type="string", default="input")
+    # parser.add_option("-i", "--file", dest="file", help="specify input file", type="string", default="")
+    # parser.add_option("-j", "--jason", dest="json", help="dump json file", type="int", default="0")
+    # parser.add_option("-p", "--perc", dest="perc", help="cp percentage deadline", type="int", default="-1")
+    # parser.add_option("-v", "--verbose", dest="verbose", help="verbose output", type="int", default="0")
+    # (options, args) = parser.parse_args()
+    #
+    #
+    #
+    # if options.file:
+    #     dag_file = options.dir + '//' + options.file + '//' + options.file + '.propfile'
+    #     perf_file = options.dir + '/' + options.file + '/performance'
+    #     deadline_file = options.dir + '/' + options.file + '/deadline'
+    #     price_file = options.dir + '/' + options.file + '/price'
+    # else:
+    #     sys.exit("\nERROR - Missing option -f or --file.\n")
+    # verbose = options.verbose
+    verbose = 0
     print("Open file '", dag_file, "'")
 
     f = open(dag_file, 'r')
@@ -1608,8 +1625,8 @@ def main(argv):
 
     deadline = 0
 
-    if options.json == 1:
-        dumpJSON(0, number_of_nodes - 1)
+    # if options.json == 1:
+    dumpJSON(0, number_of_nodes - 1)
 
     f = open(deadline_file, 'r')
     for line in f:
@@ -1684,9 +1701,9 @@ def main(argv):
     criticalp_time2 += G.node[pcp[len(pcp) - 1]]["time2"]
     criticalp_time3 += G.node[pcp[len(pcp) - 1]]["time3"]
 
-    if options.perc > 0:
-        deadline = int(100. * float(criticalp_time1) / float(options.perc))
-        print("new deadline: ", deadline)
+    # if options.perc > 0:
+    #     deadline = int(100. * float(criticalp_time1) / float(options.perc))
+    #     print("new deadline: ", deadline)
 
     G.node[0]["EST"] = 0
     G.node[0]["EFT"] = 0 + G.node[0]["time1"]
