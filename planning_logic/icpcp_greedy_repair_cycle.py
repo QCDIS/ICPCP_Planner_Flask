@@ -1662,7 +1662,6 @@ def main(argv, command_line=True, graph=None, prep_prices=None, prep_deadline=No
         G.node[number_of_nodes - 1]["time"] = 0
         G.node[number_of_nodes - 1]["assigned"] = 1
 
-    deadline = 0
 
     # if options.json == 1:
     dumpJSON(0, number_of_nodes - 1)
