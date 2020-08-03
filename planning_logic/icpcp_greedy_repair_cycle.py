@@ -1582,7 +1582,7 @@ def main(argv, command_line=True, graph=None, prep_prices=None, prep_deadline=No
             uorder = unum
             G1.add_node(unum)
             G1.node[unum]["order"] = uorder
-            G1.node[unum]["name"] = uname
+            G1.node[unum]["name"] = G.node[u]["name"]
             G1.node[unum]["time1"] = G.node[u]["time1"]
             G1.node[unum]["time2"] = G.node[u]["time2"]
             G1.node[unum]["time3"] = G.node[u]["time3"]
