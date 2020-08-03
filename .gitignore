@@ -106,6 +106,7 @@ ENV/
 env.bak/
 venv.bak/
 planning_logic/input/
+input
 
 # Spyder project settings
 .spyderproject
