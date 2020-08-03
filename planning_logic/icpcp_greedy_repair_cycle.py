@@ -1420,7 +1420,7 @@ def getNonInstanceNodes():
 
 
 #### the main function starts here...
-def main(argv, command_line=True, graph=None):
+def main(argv, command_line=True, graph=None, prep_prices=None, prep_deadline=None):
     global verbose, G, number_of_nodes, deadline, prices
 
     # dag_file = 'input//input//sipht//1.30.1/1.30.1.propfile'
@@ -1514,26 +1514,52 @@ def main(argv, command_line=True, graph=None):
                 wval_arr = wstr.split('=')
                 G.add_edge(node0, node1)
                 G[node0][node1]['throughput'] = int(wval_arr[1])
+
         f.close
+
+        number_of_nodes = G.number_of_nodes()
+
+        f = open(perf_file, 'r')
+        t = 0
+        for line in f:
+            line = line.strip(' ')
+            line = line.rstrip('\n')
+            line = line.rstrip('\r')
+            t += 1
+            tstr = "time" + str(t)
+            perf_arr = line.split(',')
+            print(tstr, perf_arr)
+            for inode in range(0, number_of_nodes):
+                G.node[inode][tstr] = int(perf_arr[inode])
+        f.close
+
+        f = open(deadline_file, 'r')
+        for line in f:
+            line = line.strip(' ')
+            line = line.rstrip('\n')
+            line = line.rstrip('\r')
+            deadline = int(line)
+        f.close
+        print("deadline: ", deadline)
+
+        prices = []
+        f = open(price_file, 'r')
+        for line in f:
+            line = line.strip(' ')
+            line = line.rstrip('\n')
+            line = line.rstrip('\r')
+            price_arr = line.split(',')
+            for pr in price_arr:
+                prices.append(int(pr))
+        f.close
+        print("prices: ", prices)
 
     else:
         G = graph
+        deadline = prep_deadline
+        prices = prep_prices
 
     number_of_nodes = G.number_of_nodes()
-
-    f = open(perf_file, 'r')
-    t = 0
-    for line in f:
-        line = line.strip(' ')
-        line = line.rstrip('\n')
-        line = line.rstrip('\r')
-        t += 1
-        tstr = "time" + str(t)
-        perf_arr = line.split(',')
-        print(tstr, perf_arr)
-        for inode in range(0, number_of_nodes):
-            G.node[inode][tstr] = int(perf_arr[inode])
-    f.close
 
     # two reasons for adding entry node
     # a) no entry node present
@@ -1641,26 +1667,7 @@ def main(argv, command_line=True, graph=None):
     # if options.json == 1:
     dumpJSON(0, number_of_nodes - 1)
 
-    f = open(deadline_file, 'r')
-    for line in f:
-        line = line.strip(' ')
-        line = line.rstrip('\n')
-        line = line.rstrip('\r')
-        deadline = int(line)
-    f.close
-    print("deadline: ", deadline)
 
-    prices = []
-    f = open(price_file, 'r')
-    for line in f:
-        line = line.strip(' ')
-        line = line.rstrip('\n')
-        line = line.rstrip('\r')
-        price_arr = line.split(',')
-        for pr in price_arr:
-            prices.append(int(pr))
-    f.close
-    print("prices: ", prices)
 
     printPerformances()
 
