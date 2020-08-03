@@ -1420,15 +1420,24 @@ def getNonInstanceNodes():
 
 
 #### the main function starts here...
-def main(argv, command_line=True):
+def main(argv, command_line=True, graph=None):
     global verbose, G, number_of_nodes, deadline, prices
+
+    # dag_file = 'input//input//sipht//1.30.1/1.30.1.propfile'
+    # perf_file = 'input//input//sipht//1.30.1/performance'
+    # deadline_file = 'input//input//sipht//1.30.1/deadline'
+    # price_file = 'input//input//sipht/1.30.1/price'
 
     dag_file = 'input//input//pcp//pcp.propfile'
     perf_file = 'input//input//pcp//performance'
     deadline_file = 'input//input//pcp//deadline'
-    price_file = 'input//input//pcp//price'
+    price_file = 'input//input//pcp/price'
+    dag_file = os.path.join(os.getcwd(), dag_file)
+    perf_file = os.path.join(os.getcwd(), perf_file)
+    deadline_file = os.path.join(os.getcwd(), deadline_file)
+    price_file = os.path.join(os.getcwd(), price_file)
 
-    #load input via yaml
+    # load input via yaml
     # if not command_line:
     #     with open(combined_input, 'r') as stream:
     #         data_loaded = yaml.safe_load(stream)
@@ -1439,7 +1448,7 @@ def main(argv, command_line=True):
     #         for key, value in perf_data.items():
     #             l.append(value)
 
-    #load input via cmd
+    # load input via cmd
     # else:
 
     # usage = "usage: %prog options name"
@@ -1465,46 +1474,50 @@ def main(argv, command_line=True):
     verbose = 0
     print("Open file '", dag_file, "'")
 
-    f = open(dag_file, 'r')
+    if command_line:
+        f = open(dag_file, 'r')
 
-    for line in f:
-        if line.find("->") > -1:
-            # print line,
-            line = line.strip(' ')
-            line = line.rstrip('\t')
-            line = line.rstrip('\n')
-            line = line.rstrip('\r')
-            line_arr = line.split('\t')
-            # l_parsed = ''
-            # for i in xrange(len(line_arr)) :
-            #    l_parsed += " '" + line_arr[i] +"'"
-            # print l_parsed
-            node_arr = line_arr[1].split(' ')
-            node0 = int(node_arr[0])
-            node1 = int(node_arr[2])
-            if not G.has_node(node0):
-                G.add_node(node0)
-                G.node[node0]["order"] = node0
-                G.node[node0]["name"] = "t" + str(node0)
-                G.node[node0]["time1"] = 0
-                G.node[node0]["time2"] = 0
-                G.node[node0]["time3"] = 0
-            if not G.has_node(node1):
-                G.add_node(node1)
-                G.node[node1]['order'] = node1
-                G.node[node1]["name"] = "t" + str(node1)
-                G.node[node1]["time1"] = 0
-                G.node[node1]["time2"] = 0
-                G.node[node1]["time3"] = 0
-            wstr = line_arr[2].strip(' ')
-            wstr = wstr.rstrip(';')
-            wstr = wstr.rstrip(']')
-            wstr = wstr.rstrip('0')
-            wstr = wstr.rstrip('.')
-            wval_arr = wstr.split('=')
-            G.add_edge(node0, node1)
-            G[node0][node1]['throughput'] = int(wval_arr[1])
-    f.close
+        for line in f:
+            if line.find("->") > -1:
+                # print line,
+                line = line.strip(' ')
+                line = line.rstrip('\t')
+                line = line.rstrip('\n')
+                line = line.rstrip('\r')
+                line_arr = line.split('\t')
+                # l_parsed = ''
+                # for i in xrange(len(line_arr)) :
+                #    l_parsed += " '" + line_arr[i] +"'"
+                # print l_parsed
+                node_arr = line_arr[1].split(' ')
+                node0 = int(node_arr[0])
+                node1 = int(node_arr[2])
+                if not G.has_node(node0):
+                    G.add_node(node0)
+                    G.node[node0]["order"] = node0
+                    G.node[node0]["name"] = "t" + str(node0)
+                    G.node[node0]["time1"] = 0
+                    G.node[node0]["time2"] = 0
+                    G.node[node0]["time3"] = 0
+                if not G.has_node(node1):
+                    G.add_node(node1)
+                    G.node[node1]['order'] = node1
+                    G.node[node1]["name"] = "t" + str(node1)
+                    G.node[node1]["time1"] = 0
+                    G.node[node1]["time2"] = 0
+                    G.node[node1]["time3"] = 0
+                wstr = line_arr[2].strip(' ')
+                wstr = wstr.rstrip(';')
+                wstr = wstr.rstrip(']')
+                wstr = wstr.rstrip('0')
+                wstr = wstr.rstrip('.')
+                wval_arr = wstr.split('=')
+                G.add_edge(node0, node1)
+                G[node0][node1]['throughput'] = int(wval_arr[1])
+        f.close
+
+    else:
+        G = graph
 
     number_of_nodes = G.number_of_nodes()
 
@@ -1573,7 +1586,7 @@ def main(argv, command_line=True):
     print(outlist)
     num_zero = 0
     for j in outlist:
-        if inlist[j] == 0:
+        if outlist[j] == 0:
             num_zero += 1
 
     if num_zero > 1 or (num_zero == 1 and G.node[number_of_nodes - 1]["time1"] > 0):
