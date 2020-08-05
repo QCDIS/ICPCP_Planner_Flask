@@ -65,10 +65,10 @@ def prepare_icpcp_greedy(tasks, dependencies):
 
     return graph
 
-def run_icpc_greedy(dag=None, combined_input=None):
+def run_icpc_greedy(dag=None, performance, price, deadline):
     wf = Workflow()
     print(os.getcwd())
-    wf.init(dag, combined_input)
+    wf.init(dag, performane, price, deadline)
     wf.calc_startConfiguration(-1)
 
     start_cost, start_eft = wf.getStartCost()
@@ -121,7 +121,7 @@ def send_vm_configuration():
     dependencies = data['dependencies']
     tasks = data['tasks']
     icpcp_params = data['icpcp_params']
-    performance = price = icpcp_params['performance']
+    performance = icpcp_params['performance']
     price = icpcp_params['price']
     deadline = icpcp_params['deadline']
 
@@ -155,7 +155,8 @@ def send_vm_configuration():
                 servers.append(server)
 
     else:
-
+        graph = prepare_icpcp_greedy(tasks, dependencies)
+        run_icpc_greedy(graph, performance, price, deadline)
 
     #put relevant extracted data in json format to be sent basck to the backend
     response_json = []
