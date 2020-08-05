@@ -6,6 +6,7 @@ import networkx as nx
 import random as rng
 import sys
 from planning_logic.instance import Instance as vm_instance
+from planning_logic.icpcp_greedy import Workflow
 REQUEST_API = Blueprint('request_api', __name__)
 
 
@@ -47,6 +48,63 @@ def prepare_icpcp(dependencies, tasks, performance_model=None):
     print(G.number_of_nodes())
     return G
 
+
+def prepare_icpcp_greedy(tasks, dependencies):
+    graph = nx.Digraph()
+    for i in range(0, len(tasks)):
+        task = tasks[i]
+        graph.add_node(i, order=i, name=task, est=-1, eft=-1, lst=-1,
+                    lft=-1)
+
+    for key, value in dependencies.items():
+        for edge_node in value:
+            throughput = rng.randrange(0, 5)
+            key_index = tasks.index(key)
+            edge_node_index = tasks.index(edge_node)
+            graph.add_weighted_edges_from([key_index, edge_node_index, throughput])
+
+    return graph
+
+def run_icpc_greedy(dag=None, combined_input=None):
+    wf = Workflow()
+    print(os.getcwd())
+    wf.init(dag, combined_input)
+    wf.calc_startConfiguration(-1)
+
+    start_cost, start_eft = wf.getStartCost()
+    start_str = "start configuartion: cost=" + str(start_cost) + "  EFT(exit)=" + str(start_eft)
+    print("\nStart situation")
+    wf.printGraphTimes()
+
+    wf.ic_pcp()
+    print("\nEnd situation")
+    wf.printGraphTimes()
+
+    # vm and exit node not part of PCP, so
+    # adjust LST, LFT of vm node
+    # adjust EST, EFT of exit node
+    wf.update_node(0)
+    wf.update_node(wf.number_of_nodes() - 1)
+    #
+    # # check PCP end situation
+    wf.updateGraphTimes()
+
+    retVal = wf.checkGraphTimes()
+    print("checkGraphTimes: retVal=" + str(retVal))
+    tot_idle = wf.checkIdleTime()
+    print("checkIdleTime: idle time=" + str(tot_idle))
+
+    wf.print_instances(tot_idle)
+
+    print("\n" + start_str)
+    if retVal == -1:
+        print("\n**** Invalid final configuration ****")
+    else:
+        final_cost, final_eft = wf.cal_cost()
+        print("final configuration: cost=" + str(final_cost) + "  EFT(exit)=" + str(final_eft))
+
+    return wf.instances
+
 @REQUEST_API.route('/plan', methods=['POST'])
 def send_vm_configuration():
     """Return optimal vm configuration
@@ -67,33 +125,37 @@ def send_vm_configuration():
     price = icpcp_params['price']
     deadline = icpcp_params['deadline']
 
-    #put parameters in a graph to be able to run icpcp
-    graph = prepare_icpcp(dependencies, tasks, performance)
-    icpcp_greedy_repair.main(sys.argv[1:], command_line=False, graph=graph, prep_prices=price, prep_deadline=deadline)
+    if(greedy_repair):
+        #put parameters in a graph to be able to run icpcp
+        graph = prepare_icpcp(dependencies, tasks, performance)
+        icpcp_greedy_repair.main(sys.argv[1:], command_line=False, graph=graph, prep_prices=price, prep_deadline=deadline)
 
-    #now we want to extract the number of vms and other relevant data
-    nodes_in_inst = 0
-    number_of_nodes = icpcp_greedy_repair.number_of_nodes
-    G = icpcp_greedy_repair.G
-    instances = icpcp_greedy_repair.instances
+        #now we want to extract the number of vms and other relevant data
+        nodes_in_inst = 0
+        number_of_nodes = icpcp_greedy_repair.number_of_nodes
+        G = icpcp_greedy_repair.G
+        instances = icpcp_greedy_repair.instances
 
-    servers = []
-    for inst in instances:
-        if len(inst) > 0:
-            linst = len(inst)
-            nodes_in_inst += linst
-            serv = G.node[inst[0]]["Service"]
-            ninst = G.node[inst[0]]["Instance"]
-            est = G.node[inst[0]]["EST"]
-            eft = G.node[inst[linst - 1]]["EFT"]
-            duration = eft - est
+        servers = []
+        for inst in instances:
+            if len(inst) > 0:
+                linst = len(inst)
+                nodes_in_inst += linst
+                serv = G.node[inst[0]]["Service"]
+                ninst = G.node[inst[0]]["Instance"]
+                est = G.node[inst[0]]["EST"]
+                eft = G.node[inst[linst - 1]]["EFT"]
+                duration = eft - est
 
-            tasklist = []
-            for k in range(0, linst):
-                tasklist.append(G.node[inst[k]]["name"])
+                tasklist = []
+                for k in range(0, linst):
+                    tasklist.append(G.node[inst[k]]["name"])
 
-            server = vm_instance(serv, duration, est, eft, tasklist)
-            servers.append(server)
+                server = vm_instance(serv, duration, est, eft, tasklist)
+                servers.append(server)
+
+    else:
+
 
     #put relevant extracted data in json format to be sent basck to the backend
     response_json = []
