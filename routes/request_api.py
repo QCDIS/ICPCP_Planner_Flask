@@ -55,6 +55,10 @@ def send_vm_configuration():
     # if not request.files['file']:
     #     abort(400)
 
+    #set to false to use greedy version of icpcp
+    greedy_repair = True
+
+    #extract data from request
     data = request.get_json(force=True)
     dependencies = data['dependencies']
     tasks = data['tasks']
@@ -62,16 +66,16 @@ def send_vm_configuration():
     performance = price = icpcp_params['performance']
     price = icpcp_params['price']
     deadline = icpcp_params['deadline']
-    # endpoint_parameters = data[]
+
+    #put parameters in a graph to be able to run icpcp
     graph = prepare_icpcp(dependencies, tasks, performance)
     icpcp_greedy_repair.main(sys.argv[1:], command_line=False, graph=graph, prep_prices=price, prep_deadline=deadline)
 
+    #now we want to extract the number of vms and other relevant data
     nodes_in_inst = 0
     number_of_nodes = icpcp_greedy_repair.number_of_nodes
     G = icpcp_greedy_repair.G
     instances = icpcp_greedy_repair.instances
-    rstr = "\nPCP solution for task graph with " + str(number_of_nodes) + " nodes"
-    rstr += "\n     Start time    Stop time    Duration    Inst cost    Number of nodes"
 
     servers = []
     for inst in instances:
@@ -83,8 +87,6 @@ def send_vm_configuration():
             est = G.node[inst[0]]["EST"]
             eft = G.node[inst[linst - 1]]["EFT"]
             duration = eft - est
-            rstr += "\nS" + str(serv) + "," + str(ninst)
-            rstr += "   " + str(est) + "    " + str(eft) + "    " + str(duration)
 
             tasklist = []
             for k in range(0, linst):
@@ -92,6 +94,8 @@ def send_vm_configuration():
 
             server = vm_instance(serv, duration, est, eft, tasklist)
             servers.append(server)
+
+    #put relevant extracted data in json format to be sent basck to the backend
     response_json = []
 
     for i in range(0, len(servers)):
@@ -100,17 +104,13 @@ def send_vm_configuration():
              'mem_size': "{} MB".format(int((i + 1) * 4096))}
         instance.properties = x
 
-    # generate output format
+    # generate more output format
     for serv in servers:
         entry = serv.properties
         entry['tasks'] = serv.task_list
         entry['vm_start'] = serv.vm_start
         entry['vm_end'] = serv.vm_end
         response_json.append(entry)
-
-    print(icpcp_greedy_repair.number_of_nodes)
-    print(icpcp_greedy_repair.instances)
-    print(rstr)
 
 
     # TODO: handle error codes
