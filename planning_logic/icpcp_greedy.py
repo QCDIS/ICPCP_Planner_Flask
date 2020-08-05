@@ -28,7 +28,7 @@ from networkx import DiGraph
 class Workflow:
 
 
-    def init(self, dag=None, performance, price, deadline):
+    def init(self, dag, performance, price, deadline):
 
         # Initialization
         self.visited = []
@@ -45,8 +45,8 @@ class Workflow:
         self.deadline = deadline
         perf_data = performance
         l = []
-        for key, value in perf_data.items():
-            l.append(value)
+        for vm_performance in perf_data:
+            l.append(vm_performance)
         # with open(combined_input, 'r') as stream:
         #     data_loaded = yaml.safe_load(stream)
         #     self.vm_price = data_loaded[0]["price"]

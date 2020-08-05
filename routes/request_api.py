@@ -7,6 +7,7 @@ import random as rng
 import sys
 from planning_logic.instance import Instance as vm_instance
 from planning_logic.icpcp_greedy import Workflow
+
 REQUEST_API = Blueprint('request_api', __name__)
 
 
@@ -17,7 +18,7 @@ def get_blueprint():
 
 def prepare_icpcp(dependencies, tasks, performance_model=None):
     G = nx.DiGraph()
-    #add tasks to graph
+    # add tasks to graph
     for i in range(0, len(tasks)):
         if not G.has_node(i):
             G.add_node(i)
@@ -27,10 +28,10 @@ def prepare_icpcp(dependencies, tasks, performance_model=None):
             G.node[i]["time2"] = 0
             G.node[i]["time3"] = 0
 
-    #add dependencies
+    # add dependencies
     for key, value in dependencies.items():
         for edge_node in value:
-            #TODO: find better way to do this, as this will slow our program
+            # TODO: find better way to do this, as this will slow our program
             key_index = tasks.index(key)
             edge_node_index = tasks.index(edge_node)
             throughput = rng.randrange(0, 5)
@@ -50,25 +51,27 @@ def prepare_icpcp(dependencies, tasks, performance_model=None):
 
 
 def prepare_icpcp_greedy(tasks, dependencies):
-    graph = nx.Digraph()
+    graph = nx.DiGraph()
+
     for i in range(0, len(tasks)):
         task = tasks[i]
         graph.add_node(i, order=i, name=task, est=-1, eft=-1, lst=-1,
-                    lft=-1)
+                       lft=-1)
 
     for key, value in dependencies.items():
         for edge_node in value:
-            throughput = rng.randrange(0, 5)
+            throughput = rng.randrange(1, 5)
             key_index = tasks.index(key)
             edge_node_index = tasks.index(edge_node)
-            graph.add_weighted_edges_from([key_index, edge_node_index, throughput])
+            graph.add_weighted_edges_from([(key_index, edge_node_index, throughput)])
 
     return graph
 
-def run_icpc_greedy(dag=None, performance, price, deadline):
+
+def run_icpc_greedy(dag, performance, price, deadline):
     wf = Workflow()
     print(os.getcwd())
-    wf.init(dag, performane, price, deadline)
+    wf.init(dag, performance, price, deadline)
     wf.calc_startConfiguration(-1)
 
     start_cost, start_eft = wf.getStartCost()
@@ -105,6 +108,7 @@ def run_icpc_greedy(dag=None, performance, price, deadline):
 
     return wf.instances
 
+
 @REQUEST_API.route('/plan', methods=['POST'])
 def send_vm_configuration():
     """Return optimal vm configuration
@@ -113,10 +117,10 @@ def send_vm_configuration():
     # if not request.files['file']:
     #     abort(400)
 
-    #set to false to use greedy version of icpcp
-    greedy_repair = True
+    # set to false to use greedy version of icpcp
+    greedy_repair = False
 
-    #extract data from request
+    # extract data from request
     data = request.get_json(force=True)
     dependencies = data['dependencies']
     tasks = data['tasks']
@@ -125,12 +129,13 @@ def send_vm_configuration():
     price = icpcp_params['price']
     deadline = icpcp_params['deadline']
 
-    if(greedy_repair):
-        #put parameters in a graph to be able to run icpcp
+    if (greedy_repair):
+        # put parameters in a graph to be able to run icpcp
         graph = prepare_icpcp(dependencies, tasks, performance)
-        icpcp_greedy_repair.main(sys.argv[1:], command_line=False, graph=graph, prep_prices=price, prep_deadline=deadline)
+        icpcp_greedy_repair.main(sys.argv[1:], command_line=False, graph=graph, prep_prices=price,
+                                 prep_deadline=deadline)
 
-        #now we want to extract the number of vms and other relevant data
+        # now we want to extract the number of vms and other relevant data
         nodes_in_inst = 0
         number_of_nodes = icpcp_greedy_repair.number_of_nodes
         G = icpcp_greedy_repair.G
@@ -156,9 +161,9 @@ def send_vm_configuration():
 
     else:
         graph = prepare_icpcp_greedy(tasks, dependencies)
-        run_icpc_greedy(graph, performance, price, deadline)
+        servers = run_icpc_greedy(graph, performance, price, deadline)
 
-    #put relevant extracted data in json format to be sent basck to the backend
+    # put relevant extracted data in json format to be sent basck to the backend
     response_json = []
 
     for i in range(0, len(servers)):
@@ -174,7 +179,6 @@ def send_vm_configuration():
         entry['vm_start'] = serv.vm_start
         entry['vm_end'] = serv.vm_end
         response_json.append(entry)
-
 
     # TODO: handle error codes
     return jsonify(response_json), 200
