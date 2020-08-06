@@ -171,15 +171,24 @@ def send_vm_configuration():
         x = {'num_cpus': i + 1, 'disk_size': "{} GB".format((i + 1) * 10),
              'mem_size': "{} MB".format(int((i + 1) * 4096))}
         instance.properties = x
+        if not greedy_repair:
+            for t in instance.task_list:
+                instance.task_names.append(tasks[t - 1])
 
     # generate more output format
     for serv in servers:
         entry = serv.properties
-        entry['tasks'] = serv.task_list
-        entry['vm_start'] = serv.vm_start
-        entry['vm_end'] = serv.vm_end
+        entry['tasks'] = serv.task_names
+        if not greedy_repair:
+            entry['vm_start'] = serv.vm_start.item()
+            entry['vm_end'] = serv.vm_end.item()
+        else:
+            entry['vm_start'] = serv.vm_start
+            entry['vm_end'] = serv.vm_end
+
         response_json.append(entry)
 
+    print(response_json)
     # TODO: handle error codes
     return jsonify(response_json), 200
 
