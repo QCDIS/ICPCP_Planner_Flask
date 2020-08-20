@@ -16,7 +16,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY . /usr/src/app
 #WORKDIR /app
 
-EXPOSE 5001
+EXPOSE 5002
 ENTRYPOINT ["python3"]
 
 CMD ["app.py"]
