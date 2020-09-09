@@ -163,7 +163,7 @@ def send_vm_configuration():
         graph = prepare_icpcp_greedy(tasks, dependencies)
         servers = run_icpc_greedy(graph, performance, price, deadline)
 
-    # put relevant extracted data in json format to be sent basck to the backend
+    # put relevant extracted data in json format to be sent back to the backend
     response_json = []
 
     for i in range(0, len(servers)):
@@ -182,9 +182,13 @@ def send_vm_configuration():
         if not greedy_repair:
             entry['vm_start'] = serv.vm_start.item()
             entry['vm_end'] = serv.vm_end.item()
+            entry['vm_cost'] = serv.vm_cost
+            entry['vm_type'] = serv.vm_type
         else:
             entry['vm_start'] = serv.vm_start
             entry['vm_end'] = serv.vm_end
+            entry['vm_cost'] = serv.vm_cost
+            entry['vm_type'] = serv.vm_type
 
         response_json.append(entry)
 
