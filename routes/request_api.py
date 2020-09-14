@@ -187,7 +187,7 @@ def send_vm_configuration():
         else:
             entry['vm_start'] = serv.vm_start
             entry['vm_end'] = serv.vm_end
-            entry['vm_cost'] = serv.vm_cost
+            entry['vm_cost'] = price[serv.vm_type - 1]
             entry['vm_type'] = serv.vm_type
 
         response_json.append(entry)
