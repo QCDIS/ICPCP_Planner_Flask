@@ -34,7 +34,8 @@ def prepare_icpcp(dependencies, tasks, performance_model=None):
             # TODO: find better way to do this, as this will slow our program
             key_index = tasks.index(key)
             edge_node_index = tasks.index(edge_node)
-            throughput = rng.randrange(0, 5)
+            # throughput = rng.randrange(0, 5)
+            throughput = 1
             G.add_edge(key_index, edge_node_index)
             G[key_index][edge_node_index]['throughput'] = throughput
 
@@ -60,7 +61,8 @@ def prepare_icpcp_greedy(tasks, dependencies):
 
     for key, value in dependencies.items():
         for edge_node in value:
-            throughput = rng.randrange(1, 5)
+            # throughput = rng.randrange(0, 5)
+            throughput = 1
             key_index = tasks.index(key)
             edge_node_index = tasks.index(edge_node)
             graph.add_weighted_edges_from([(key_index, edge_node_index, throughput)])
