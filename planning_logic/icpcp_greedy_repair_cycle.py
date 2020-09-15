@@ -1568,7 +1568,7 @@ def main(argv, command_line=True, graph=None, prep_prices=None, prep_deadline=No
     print(inlist)
     num_zero = 0
     for j in inlist:
-        if inlist[j] == 0:
+        if j[1] == 0:
             num_zero += 1
     if num_zero > 1 or (num_zero == 1 and G.node[0]["time1"] > 0):
         if num_zero > 1:
@@ -1612,7 +1612,7 @@ def main(argv, command_line=True, graph=None, prep_prices=None, prep_deadline=No
     print(outlist)
     num_zero = 0
     for j in outlist:
-        if outlist[j] == 0:
+        if j[1] == 0:
             num_zero += 1
 
     if num_zero > 1 or (num_zero == 1 and G.node[number_of_nodes - 1]["time1"] > 0):
