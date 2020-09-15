@@ -1,7 +1,7 @@
 import uuid
 from flask import jsonify, abort, request, Blueprint
 import os
-import planning_logic.icpcp_greedy_repair_cycle as icpcp_greedy_repair
+import planning_logic.icpcp_greedy_repair as icpcp_greedy_repair
 import networkx as nx
 import random as rng
 import sys
@@ -118,7 +118,7 @@ def send_vm_configuration():
     #     abort(400)
 
     # set to false to use greedy version of icpcp
-    greedy_repair = False
+    greedy_repair = True
 
     # extract data from request
     data = request.get_json(force=True)
