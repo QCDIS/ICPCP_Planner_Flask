@@ -70,7 +70,7 @@ class Workflow:
         print(inlist)
         num_zero = 0
         for j in inlist:
-            if inlist[j] == 0:
+            if j[1] == 0:
                 num_zero += 1
         if num_zero > 1 or (num_zero == 1 and self.p_table[0, 0] > 0):
             if num_zero > 1:
@@ -89,7 +89,7 @@ class Workflow:
         outlist = list(self.G.out_degree())
         num_zero = 0
         for j in outlist:
-            if outlist[j] == 0:
+            if j[1] == 0:
                 num_zero += 1
         if num_zero > 1 or (num_zero == 1 and self.p_table[0, self.vertex_num - 1] > 0):
             if num_zero > 1:

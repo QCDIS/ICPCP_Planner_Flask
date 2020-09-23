@@ -35,7 +35,7 @@ def prepare_icpcp(dependencies, tasks, performance_model=None):
             key_index = tasks.index(key)
             edge_node_index = tasks.index(edge_node)
             # throughput = rng.randrange(0, 5)
-            throughput = 1
+            throughput = 0
             G.add_edge(key_index, edge_node_index)
             G[key_index][edge_node_index]['throughput'] = throughput
 
@@ -62,7 +62,7 @@ def prepare_icpcp_greedy(tasks, dependencies):
     for key, value in dependencies.items():
         for edge_node in value:
             # throughput = rng.randrange(0, 5)
-            throughput = 1
+            throughput = 0
             key_index = tasks.index(key)
             edge_node_index = tasks.index(edge_node)
             graph.add_weighted_edges_from([(key_index, edge_node_index, throughput)])
@@ -120,7 +120,7 @@ def send_vm_configuration():
     #     abort(400)
 
     # set to false to use greedy version of icpcp
-    greedy_repair = True
+    greedy_repair = False
 
     # extract data from request
     data = request.get_json(force=True)
@@ -179,6 +179,7 @@ def send_vm_configuration():
 
     # generate more output format
     for serv in servers:
+
         entry = serv.properties
         entry['tasks'] = serv.task_names
         if not greedy_repair:
