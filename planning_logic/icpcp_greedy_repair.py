@@ -13,7 +13,10 @@ import networkx as nx
 
 import re
 from optparse import OptionParser
-
+#
+# class GreedyRepairCycle(object):
+#
+#     def __init__(self, command_line=True, graph=None, prep_prices=None, prep_deadline=None):
 G = nx.DiGraph()
 number_of_nodes = 0
 step = 0
@@ -1225,7 +1228,19 @@ def getNonInstanceNodes():
 
 #### the main function starts here...
 def main(argv, command_line=True, graph=None, prep_prices=None, prep_deadline=None):
-    global verbose, G, number_of_nodes, deadline, prices, valid_configuration
+    global verbose, G, number_of_nodes, deadline, prices, valid_configuration, step, instances, n_service1_inst, n_service2_inst, n_service3_inst, tot_idle
+    G = nx.DiGraph()
+    number_of_nodes = 0
+    step = 0
+    deadline = 0
+    instances = []
+    n_service1_inst = 0
+    n_service2_inst = 0
+    n_service3_inst = 0
+    verbose = 0
+    prices = []
+    tot_idle = 0
+    valid_configuration = False
 
     if command_line:
         usage = "usage: %prog options name"

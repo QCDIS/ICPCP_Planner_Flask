@@ -120,7 +120,7 @@ def send_vm_configuration():
     #     abort(400)
 
     # set to false to use greedy version of icpcp
-    greedy_repair = False
+    greedy_repair = True
 
     # extract data from request
     data = request.get_json(force=True)
