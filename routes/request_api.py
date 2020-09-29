@@ -10,7 +10,7 @@ from planning_logic.icpcp_greedy import Workflow
 
 REQUEST_API = Blueprint('request_api', __name__)
 # set to false to use greedy version of icpcp
-GREEDY_REPAIR_CYCLE = True
+GREEDY_REPAIR_CYCLE = False
 
 def get_blueprint():
     """Return the blueprint for the main app module"""
