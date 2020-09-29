@@ -9,7 +9,8 @@ from planning_logic.instance import Instance as vm_instance
 from planning_logic.icpcp_greedy import Workflow
 
 REQUEST_API = Blueprint('request_api', __name__)
-
+# set to false to use greedy version of icpcp
+GREEDY_REPAIR_CYCLE = True
 
 def get_blueprint():
     """Return the blueprint for the main app module"""
@@ -110,6 +111,9 @@ def run_icpc_greedy(dag, performance, price, deadline):
 
     return wf.instances
 
+@REQUEST_API.route('/version', methods=['POST'])
+def send_vm_configuration():
+    return jsonify(GREEDY_REPAIR_CYCLE)
 
 @REQUEST_API.route('/plan', methods=['POST'])
 def send_vm_configuration():
@@ -119,8 +123,6 @@ def send_vm_configuration():
     # if not request.files['file']:
     #     abort(400)
 
-    # set to false to use greedy version of icpcp
-    greedy_repair = True
 
     # extract data from request
     data = request.get_json(force=True)
@@ -131,7 +133,7 @@ def send_vm_configuration():
     price = icpcp_params['price']
     deadline = icpcp_params['deadline']
 
-    if (greedy_repair):
+    if (GREEDY_REPAIR_CYCLE):
         # put parameters in a graph to be able to run icpcp
         graph = prepare_icpcp(dependencies, tasks, performance)
         icpcp_greedy_repair.main(sys.argv[1:], command_line=False, graph=graph, prep_prices=price,
@@ -173,7 +175,7 @@ def send_vm_configuration():
         x = {'num_cpus': i + 1, 'disk_size': "{} GB".format((i + 1) * 10),
              'mem_size': "{} MB".format(int((i + 1) * 4096))}
         instance.properties = x
-        if not greedy_repair:
+        if not GREEDY_REPAIR_CYCLE:
             for t in instance.task_list:
                 instance.task_names.append(tasks[t - 1])
 
@@ -182,7 +184,7 @@ def send_vm_configuration():
 
         entry = serv.properties
         entry['tasks'] = serv.task_names
-        if not greedy_repair:
+        if not GREEDY_REPAIR_CYCLE:
             entry['vm_start'] = serv.vm_start.item()
             entry['vm_end'] = serv.vm_end.item()
             entry['vm_cost'] = serv.vm_cost
