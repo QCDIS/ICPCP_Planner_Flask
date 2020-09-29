@@ -116,7 +116,7 @@ def send_vm_configuration():
     return jsonify(GREEDY_REPAIR_CYCLE)
 
 @REQUEST_API.route('/plan', methods=['POST'])
-def send_vm_configuration():
+def send_vm_configuration1():
     """Return optimal vm configuration
     """
 
