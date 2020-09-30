@@ -31,21 +31,21 @@ def prepare_icpcp(dependencies, tasks, performance_model=None):
 
     # add dependencies
     for key, value in dependencies.items():
-        # TODO: find better way to do this, as this will slow our program
-        key_index = tasks.index(key)
-        edge_node_index = tasks.index(value)
-        # throughput = rng.randrange(0, 5)
-        throughput = 0
-        G.add_edge(key_index, edge_node_index)
-        G[key_index][edge_node_index]['throughput'] = throughput
-        # for edge_node in value:
-        #     # TODO: find better way to do this, as this will slow our program
-        #     key_index = tasks.index(key)
-        #     edge_node_index = tasks.index(edge_node)
-        #     # throughput = rng.randrange(0, 5)
-        #     throughput = 0
-        #     G.add_edge(key_index, edge_node_index)
-        #     G[key_index][edge_node_index]['throughput'] = throughput
+        # # TODO: find better way to do this, as this will slow our program
+        # key_index = tasks.index(key)
+        # edge_node_index = tasks.index(value)
+        # # throughput = rng.randrange(0, 5)
+        # throughput = 0
+        # G.add_edge(key_index, edge_node_index)
+        # G[key_index][edge_node_index]['throughput'] = throughput
+        for edge_node in value:
+            # TODO: find better way to do this, as this will slow our program
+            key_index = tasks.index(key)
+            edge_node_index = tasks.index(edge_node)
+            # throughput = rng.randrange(0, 5)
+            throughput = 0
+            G.add_edge(key_index, edge_node_index)
+            G[key_index][edge_node_index]['throughput'] = throughput
 
     number_of_nodes = G.number_of_nodes()
     t = 0
