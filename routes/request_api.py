@@ -10,14 +10,14 @@ from planning_logic.icpcp_greedy import Workflow
 
 REQUEST_API = Blueprint('request_api', __name__)
 # set to false to use greedy version of icpcp
-GREEDY_REPAIR_CYCLE = False
+GREEDY_REPAIR_CYCLE = True
 
 def get_blueprint():
     """Return the blueprint for the main app module"""
     return REQUEST_API
 
 
-def prepare_icpcp(dependencies, tasks, performance_model=None):
+def prepare_icpcp_greedy_repair(dependencies, tasks, performance_model=None):
     G = nx.DiGraph()
     # add tasks to graph
     for i in range(0, len(tasks)):
@@ -35,7 +35,6 @@ def prepare_icpcp(dependencies, tasks, performance_model=None):
             # TODO: find better way to do this, as this will slow our program
             key_index = tasks.index(key)
             edge_node_index = tasks.index(edge_node)
-            # throughput = rng.randrange(0, 5)
             throughput = 0
             G.add_edge(key_index, edge_node_index)
             G[key_index][edge_node_index]['throughput'] = throughput
@@ -135,7 +134,7 @@ def send_vm_configuration1():
 
     if (GREEDY_REPAIR_CYCLE):
         # put parameters in a graph to be able to run icpcp
-        graph = prepare_icpcp(dependencies, tasks, performance)
+        graph = prepare_icpcp_greedy_repair(dependencies, tasks, performance)
         icpcp_greedy_repair.main(sys.argv[1:], command_line=False, graph=graph, prep_prices=price,
                                  prep_deadline=deadline)
 
