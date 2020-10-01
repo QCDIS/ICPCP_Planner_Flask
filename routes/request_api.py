@@ -63,15 +63,10 @@ def prepare_icpcp_greedy(tasks, dependencies):
     for key, value in dependencies.items():
         # throughput = rng.randrange(0, 5)
         throughput = 0
-        key_index = tasks.index(key)
-        edge_node_index = tasks.index(value)
-        graph.add_weighted_edges_from([(key_index, edge_node_index, throughput)])
-        # for edge_node in value:
-        #     # throughput = rng.randrange(0, 5)
-        #     throughput = 0
-        #     key_index = tasks.index(key)
-        #     edge_node_index = tasks.index(edge_node)
-        #     graph.add_weighted_edges_from([(key_index, edge_node_index, throughput)])
+        for edge_node in value:
+            key_index = tasks.index(key)
+            edge_node_index = tasks.index(edge_node)
+            graph.add_weighted_edges_from([(key_index, edge_node_index, throughput)])
 
     return graph
 
