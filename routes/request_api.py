@@ -127,6 +127,8 @@ def send_vm_configuration1():
     data = request.get_json(force=True)
     dependencies = data['dependencies']
     tasks = data['tasks']
+    selected_vms = data['selected_vms']
+
     icpcp_params = data['icpcp_params']
     performance = icpcp_params['performance']
     price = icpcp_params['price']
@@ -169,14 +171,14 @@ def send_vm_configuration1():
     # put relevant extracted data in json format to be sent back to the backend
     response_json = []
 
-    for i in range(0, len(servers)):
-        instance = servers[i]
-        x = {'num_cpus': i + 1, 'disk_size': "{} GB".format((i + 1) * 10),
-             'mem_size': "{} MB".format(int((i + 1) * 4096))}
-        instance.properties = x
+    for server in servers:
+        type = server.vm_type - 1
+        # x = {'num_cores': i + 1, 'disk_size': "{} GB".format((i + 1) * 10),
+        #      'mem_size': "{} MB".format(int((i + 1) * 4096))}
+        server.properties = selected_vms[type]
         if not GREEDY_REPAIR_CYCLE:
-            for t in instance.task_list:
-                instance.task_names.append(tasks[t - 1])
+            for t in server.task_list:
+                server.task_names.append(tasks[t - 1])
 
     # generate more output format
     for serv in servers:
