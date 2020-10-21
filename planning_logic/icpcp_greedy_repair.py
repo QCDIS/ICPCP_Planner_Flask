@@ -13,10 +13,12 @@ import networkx as nx
 
 import re
 from optparse import OptionParser
+
 #
 # class GreedyRepairCycle(object):
 #
 #     def __init__(self, command_line=True, graph=None, prep_prices=None, prep_deadline=None):
+
 G = nx.DiGraph()
 number_of_nodes = 0
 step = 0
