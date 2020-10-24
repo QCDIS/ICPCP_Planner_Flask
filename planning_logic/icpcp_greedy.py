@@ -23,7 +23,8 @@ from optparse import OptionParser
 
 # from __builtin__ import True
 from networkx import DiGraph
-
+"""To add more vms in icpcp_tosca, change line 96 in icpcp tosca and add NSx + if statement to print instances line 
+681"""
 
 class Workflow:
 
@@ -99,7 +100,7 @@ class Workflow:
             self.add_exit_node()
             # sys.exit("\nQuit\n")
             # adjust perf table
-            self.p_table = np.append(self.p_table, np.zeros((3, 1), dtype=int), axis=1)
+            self.p_table = np.append(self.p_table, np.zeros((len(l), 1), dtype=int), axis=1)
         print("number of nodes in G: " + str(self.vertex_num))
         print(self.p_table)
 
@@ -684,6 +685,10 @@ class Workflow:
 
     def print_instances(self, tot_idle):
         total_cost = 0
+        # count how many instances of what server we have, key is server number value is count
+
+        number_of_instances = {}
+        nS4 = 0
         nS3 = 0
         nS2 = 0
         nS1 = 0
@@ -696,15 +701,23 @@ class Workflow:
                 task_list = sorted(c.task_list)
                 nodes_in_inst += len(task_list)
                 serv = c.vm_type
-                if serv == 0:
-                    nS1 += 1
-                    ninst = nS1
-                elif serv == 1:
-                    nS2 += 1
-                    ninst = nS2
-                elif serv == 2:
-                    nS3 += 1
-                    ninst = nS3
+                if serv in number_of_instances:
+                    number_of_instances[serv] += 1
+                else:
+                    number_of_instances[serv] = 1
+                # if serv == 0:
+                #     nS1 += 1
+                #     ninst = nS1
+                # elif serv == 1:
+                #     nS2 += 1
+                #     ninst = nS2
+                # elif serv == 2:
+                #     nS3 += 1
+                #     ninst = nS3
+                # elif serv == 3:
+                #     nS4 += 1
+                #     ninst = nS4
+                ninst = number_of_instances[serv]
                 est = self.G.node[task_list[0]]["est"]
                 eft = self.G.node[task_list[len(task_list) - 1]]["eft"]
                 duration = eft - est
@@ -718,8 +731,11 @@ class Workflow:
                 for j in task_list:
                     pcp_str += " " + self.G.node[j]["name"]
                 rstr += "       " + pcp_str
-        print(rstr)
+        else:
+            print("No instances found")
+            return
 
+        print(rstr)
         tot_non_inst = 0
         extra_cost = 0
         print("\ntotal instance cost: " + str(total_cost))
