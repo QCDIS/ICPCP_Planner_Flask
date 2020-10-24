@@ -8,7 +8,7 @@ import os
 import requests
 
 BASE_URL = "http://localhost:5000"
-DIR_TEST_FILES = os.path.join(os.getcwd(), "test_files")
+DIR_TEST_FILES = os.path.join(os.getcwd(),"tests/test_files")
 
 
 def test_parse_file():
